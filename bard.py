@@ -1,7 +1,28 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# Copyright (C) 2023 AllTheLife
+#
+# Author:     AllTheLife <xjn208930@gmail.com>
+# Maintainer: AllTheLife <xjn208930@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import queue
 import threading
 import traceback
 import sys
+import os
 from functools import wraps
 from Bard import Chatbot
 from epc.server import ThreadingEPCServer
@@ -30,7 +51,8 @@ class Bard:
 
         self.server.register_instance(self)  # register instance functions let elisp side call
 
-        self.token = get_emacs_var("bard-cookie-token")
+        # self.token = get_emacs_var("bard-cookie-token")
+        self.token = self.get_cookie_token()
 
         self.chatbot = Chatbot(self.token)
 
@@ -59,6 +81,22 @@ class Bard:
     def cleanup(self):
         """Do some cleanup before exit python process."""
         close_epc_client()
+
+    def get_cookie_token(self):
+        bard_cookie_token_file_path = os.path.expanduser(get_emacs_var("bard-cookie-token-path"))
+        cookie_token = None
+        if os.path.exists(bard_cookie_token_file_path):
+            with open(bard_cookie_token_file_path, "r") as f:
+                key = f.read().strip()
+                if key != "":
+                    cookie_token = key
+        else:
+            cookie_token = os.environ.get("BARD_TOKEN")
+
+        if cookie_token is None:
+            message_emacs("Bard cookie token not found, please check the README.")
+
+        return cookie_token
 
     def bard_chat(self, prompt, buffer):
         content = self.chatbot.ask(prompt)

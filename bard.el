@@ -5,10 +5,10 @@
 ;; Author: AllTheLife <xjn208930@gmail.com>
 ;; Maintainer: AllTheLife <xjn208930@gmail.com>
 ;; Copyright (C) 2023, AllTheLife, all rights reserved.
-;; Created:
+;; Created: 2023-04-28 19:03:14
 ;; Version: 0.1
-;; Last-Updated:
-;;           By:
+;; Last-Updated: 2023-04-29 15:02:29
+;;           By: AllTheLife
 ;; URL:
 ;; Keywords:
 ;; Compatibility: emacs-version >= 28
@@ -84,8 +84,8 @@
   "Bard group."
   :group 'applications)
 
-(defcustom bard-cookie-token nil
-  "The token key to Google Bard."
+(defcustom bard-cookie-token-path (expand-file-name (concat user-emacs-directory (file-name-as-directory "bard") "bard_cookie_token.txt"))
+  "The file to get the token key to Google Bard."
   :type 'string
   :group 'bard)
 
@@ -253,11 +253,6 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
 
   (message "[Bard] Process started successfully."))
 
-(defun bard-set-cookie (token)
-  (setq bard-cookie-token token)
-  (unless bard-is-starting
-    (bard-start-process)))
-
 (defun bard-chat-with-message (prompt)
   (save-excursion
     (goto-char (point-max))
@@ -295,6 +290,9 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
     (if (string-empty-p (string-trim prompt))
 	(message "Please do not enter an empty prompt.")
       (bard-chat-with-message prompt))))
+
+(unless bard-is-starting
+  (bard-start-process))
 
 
 (provide 'bard)
