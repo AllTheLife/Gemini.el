@@ -78,10 +78,6 @@ class Bard:
         except:
             logger.error(traceback.format_exc())
 
-    def cleanup(self):
-        """Do some cleanup before exit python process."""
-        close_epc_client()
-
     def get_cookie_token(self):
         bard_cookie_token_file_path = os.path.expanduser(get_emacs_var("bard-cookie-token-path"))
         cookie_token = None
@@ -98,20 +94,55 @@ class Bard:
 
         return cookie_token
 
+    @threaded
     def bard_chat(self, prompt, buffer):
         content = self.chatbot.ask(prompt)
-        self.answers = list()
+        answers = list()
 
         responses = content['choices']
         for response in responses:
-            self.answers.append(response['content'][0])
+            answers.append(response['content'][0])
 
         serial_number = 1
-        for answer in self.answers:
+        for answer in answers:
             eval_in_emacs("bard-insert-answer", serial_number, answer, buffer)
             serial_number += 1
 
         eval_in_emacs("bard-finish-answer", buffer)
+
+    @threaded
+    def bard_text(self, prompt, buffer, text,
+                  notify_start, notify_end, begin=0, end=0, func=""):
+        print(prompt, "\n", buffer, "\n", text, "\n", begin, "\n", end, "\n", notify_start, "\n", notify_end, "\n", func)
+        message_emacs(notify_start)
+        answers = list()
+
+        if text == "":
+            content = f"{prompt}"
+        else:
+            content = f"{prompt}:\n{text}"
+
+        responses = self.chatbot.ask(content)
+
+        if func == "":
+            responses = responses['choices']
+
+            for response in responses:
+                answers.append(response['content'][0])
+
+            serial_number = 1
+            for answer in answers:
+                eval_in_emacs("bard-response", serial_number, answer, buffer)
+                serial_number += 1
+        else:
+            answers.append(responses['content'])
+            eval_in_emacs(func, answers[0], buffer, begin, end)
+
+        message_emacs(notify_end)
+
+    def cleanup(self):
+        """Do some cleanup before exit python process."""
+        close_epc_client()
 
 
 if __name__ == "__main__":

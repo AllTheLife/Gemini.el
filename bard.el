@@ -6,8 +6,8 @@
 ;; Maintainer: AllTheLife <xjn208930@gmail.com>
 ;; Copyright (C) 2023, AllTheLife, all rights reserved.
 ;; Created: 2023-04-28 19:03:14
-;; Version: 0.1
-;; Last-Updated: 2023-04-29 15:02:29
+;; Version: 0.3
+;; Last-Updated: 2023-04-30 12:55:19
 ;;           By: AllTheLife
 ;; URL:
 ;; Keywords:
@@ -93,8 +93,8 @@
   "The Bard Server.")
 
 (defvar bard-python-file (expand-file-name "bard.py" (if load-file-name
-                                                                   (file-name-directory load-file-name)
-                                                                 default-directory)))
+                                                         (file-name-directory load-file-name)
+                                                       default-directory)))
 
 (defvar bard-server-port nil)
 
@@ -189,11 +189,11 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
     ;; start epc server and set `bard-server-port'
     (bard--start-epc-server)
     (let* ((bard-args (append
-                            (list bard-python-file)
-                            (list (number-to-string bard-server-port))
-                            (when bard-enable-profile
-                              (list "profile"))
-                            )))
+                       (list bard-python-file)
+                       (list (number-to-string bard-server-port))
+                       (when bard-enable-profile
+                         (list "profile"))
+                       )))
 
       ;; Set process arguments.
       (if bard-enable-debug
@@ -242,12 +242,12 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
   "Call `bard--open-internal' upon receiving `start_finish' signal from server."
   ;; Make EPC process.
   (setq bard-epc-process (make-bard-epc-manager
-                               :server-process bard-internal-process
-                               :commands (cons bard-internal-process-prog bard-internal-process-args)
-                               :title (mapconcat 'identity (cons bard-internal-process-prog bard-internal-process-args) " ")
-                               :port bard-epc-port
-                               :connection (bard-epc-connect "localhost" bard-epc-port)
-                               ))
+                          :server-process bard-internal-process
+                          :commands (cons bard-internal-process-prog bard-internal-process-args)
+                          :title (mapconcat 'identity (cons bard-internal-process-prog bard-internal-process-args) " ")
+                          :port bard-epc-port
+                          :connection (bard-epc-connect "localhost" bard-epc-port)
+                          ))
   (bard-epc-init-epc-layer bard-epc-process)
   (setq bard-is-starting nil)
 
@@ -284,6 +284,28 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
     (insert "\n\n")
     (message "[Bard] Bard finished replying.")))
 
+(defun bard-response (serial-number content buffer)
+  (with-current-buffer buffer
+    (save-excursion
+      (goto-char (point-max))
+      (unless (= serial-number 1)
+	(insert "\n"))
+      (let ((point (point-max)))
+	(insert (format "### Draft %d:\n" serial-number))
+	(insert content "\n")
+	(unless (equal serial-number 1)
+	  (goto-char point)
+	  (markdown-cycle))))))
+
+(define-derived-mode bard-edit-mode text-mode "bard/edit"
+  "The major mode to edit focus text input.")
+
+(setq bard-edit-mode-map
+      (let ((map (make-sparse-keymap)))
+	(define-key map (kbd "C-c C-c") #'bard-edit-mode-confirm)
+	(define-key map (kbd "C-c C-k") #'bard-edit-mode-cancel)
+	map))
+
 (defun bard-chat ()
   (interactive)
   (let ((prompt (read-string "Chat with Bard: ")))
@@ -291,8 +313,191 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
 	(message "Please do not enter an empty prompt.")
       (bard-chat-with-message prompt))))
 
+(defun bard-chat-with-multiline ()
+  (interactive)
+  (let* ((bufname (buffer-name))
+	 (edit-buffer (generate-new-buffer (format "*bard-edit-buffer-%s*" bufname))))
+    (split-window-below -12)
+    (other-window 1)
+    (with-current-buffer edit-buffer
+      (bard-edit-mode)
+      (set (make-local-variable 'bard-edit-buffer-name) bufname))
+    (switch-to-buffer edit-buffer)
+    (bard--edit-set-header-line)))
+
+(defun bard--edit-set-header-line ()
+  "Set header line."
+  (setq header-line-format
+        (substitute-command-keys
+         (concat
+          " Bard Edit Mode: "
+          "Confirm with  C-c C-c, "
+          "Cancel with  C-c C-k. "
+          ))))
+
+(defun bard-get-buffer-string ()
+  (buffer-substring-no-properties (point-min) (point-max)))
+
+(defun bard-edit-mode-cancel ()
+  (interactive)
+  (kill-buffer)
+  (delete-window)
+  (message "[Bard] Edit cancelled!"))
+
+(defun bard-edit-mode-confirm ()
+  (interactive)
+  (let* ((bufname bard-edit-buffer-name)
+	 (prompt (bard-get-buffer-string)))
+    (kill-buffer)
+    (delete-window)
+
+    (switch-to-buffer bufname)
+    (bard-chat-with-message prompt)))
+
+(defun bard-return-code (content buffer begin end)
+  (let* ((block-start (string-match "```" content))
+	 (code-begin (string-match "\n" content (+ block-start 3)))
+	 (code-end (string-match "```" content code-begin)))
+    (with-current-buffer buffer
+      (setq code-begin (+ code-begin 1))
+      (delete-region begin end)
+      (goto-char begin)
+      (insert (substring content code-begin code-end)))))
+
+(defun bard-generate-code ()
+  (interactive)
+  (let* ((selection (if (region-active-p)
+                        (string-trim (buffer-substring-no-properties (region-beginning) (region-end)))))
+         (mode (replace-regexp-in-string "\\(-ts\\)?-mode$" "" (symbol-name major-mode)))
+         (prompt (if (= (length selection) 0)
+                     (format "%s, please only output the code, without any explanations or instructions." (read-string "Prompt: "))
+                   (format "%s, please only output the code, without any explanations or instructions." (concat mode " " selection)))))
+    (insert "\n")
+    (bard-call-async "bard_text"
+		     prompt
+                     (buffer-name)
+                     ""
+                     "Generating..."
+                     "Generate code done."
+                     (point)
+                     (point)
+		     "bard-return-code")))
+
+(defun bard-adjust-code ()
+  (interactive)
+  (let* ((selection (if (region-active-p)
+                        (string-trim (buffer-substring-no-properties (region-beginning) (region-end)))))
+         (mode (replace-regexp-in-string "\\(-ts\\)?-mode$" "" (symbol-name major-mode)))
+         (prompt (format "%s in the %s code below, please only output the code, without any explanations or instructions."
+			 (read-string "Adjust: ") mode)))
+    (bard-call-async "bard_text"
+		     prompt
+                     (buffer-name)
+                     selection
+                     "Adgjusting."
+                     "Adjust code done."
+                     (region-beginning)
+                     (region-end)
+		     "bard-return-code")))
+
+(defun bard-polish-document ()
+  (interactive)
+  (let* ((selection (if (region-active-p)
+			(string-trim (buffer-substring-no-properties (region-beginning) (region-end)))))
+	 (content (if (= (length selection) 0)
+		      (string-trim (buffer-substring-no-properties (point-min) (point-max)))
+		    ""))
+	 (buffer (generate-new-buffer (format "*bard-doc-buffer*"))))
+    (split-window-right)
+    (other-window 1)
+    (switch-to-buffer buffer)
+    (markdown-mode)
+    (delete-region (point-min) (point-max))
+    (if (region-active-p)
+	(setq final-content selection)
+      (setq final-content content))
+    (bard-call-async "bard_text"
+		     "Please help me proofread and polish the following text:\n"
+		     (buffer-name)
+		     final-content
+		     "Polishing."
+		     "Polish document done.")))
+
+(defun bard-explain-code ()
+  (interactive)
+  (let* ((selection (if (region-active-p)
+			(string-trim (buffer-substring-no-properties (region-beginning) (region-end)))))
+	 (mode (replace-regexp-in-string "\\(-ts\\)?-mode$" "" (symbol-name major-mode)))
+	 (buffer (generate-new-buffer (format "*bard-explain-buffer*")))
+	 (content (if (= (length selection) 0)
+		      (string-trim (buffer-substring-no-properties (point-min) (point-max)))
+		    "")))
+    (split-window-right)
+    (other-window 1)
+    (switch-to-buffer buffer)
+    (markdown-mode)
+    (delete-region (point-min) (point-max))
+    (if (region-active-p)
+	(setq code selection)
+      (setq code content))
+    (bard-call-async "bard_text"
+		     (format "Please explain in detail the meaning of the following %s code, leave a blank line between each sentence:\n" mode)
+		     (buffer-name)
+		     code
+		     "Explaining"
+		     "Explain code done.")))
+
+(defun bard-comment-code ()
+  (interactive)
+  (let* ((selection (if (region-active-p)
+			(string-trim (buffer-substring-no-properties (region-beginning) (region-end)))))
+	 (mode (replace-regexp-in-string "\\(-ts\\)?-mode$" "" (symbol-name major-mode)))
+	 (content (if (= (length selection) 0)
+		      (string-trim (buffer-substring-no-properties (point-min) (point-max)))
+		    "")))
+    (if (region-active-p)
+	(setq code selection
+	      begin region-beginning
+	      end region-end)
+      (setq code content
+	    begin (point-min)
+	    end (point-max)))
+    (bard-call-async "bard_text"
+		     (format "Please add code comments to the following %s code, with the comments written in English within the code, and output the code including the comments." mode)
+		     (buffer-name)
+		     code
+		     "Commenting"
+		     "Comment code done."
+		     begin
+		     end
+		     "bard-return-code")))
+
+(defun bard-refactory-code ()
+  (interactive)
+  (let* ((selection (if (region-active-p)
+			(string-trim (buffer-substring-no-properties (region-beginning) (region-end)))))
+	 (mode (replace-regexp-in-string "\\(-ts\\)?-mode$" "" (symbol-name major-mode)))
+	 (buffer (generate-new-buffer (format "*bard-explain-buffer*")))
+	 (content (if (= (length selection) 0)
+		      (string-trim (buffer-substring-no-properties (point-min) (point-max)))
+		    "")))
+    (split-window-right)
+    (other-window 1)
+    (switch-to-buffer buffer)
+    (markdown-mode)
+    (delete-region (point-min) (point-max))
+    (if (region-active-p)
+	(setq code selection)
+      (setq code content))
+    (bard-call-async "bard_text"
+		     (format "Please help me refactor the following %s code. Please reply with the refactoring explanation, refactored code, and diff between two versions. Please ignore the comments and strings in the code during the refactoring. If the code remains unchanged after refactoring, please say 'No need to refactor'." mode)
+		     (buffer-name)
+		     code
+		     "Refactorying"
+		     "Refactory code done.")))
+
 (unless bard-is-starting
-  (bard-start-process))
+  (bard-start-process)
 
 
 (provide 'bard)
