@@ -1,3 +1,5 @@
+[English Version](./README) | 简体中文
+
 # Bard.el
 享受在 Emacs 中使用 Google Bard 的快乐吧😀
 
