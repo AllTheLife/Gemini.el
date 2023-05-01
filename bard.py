@@ -113,7 +113,6 @@ class Bard:
     @threaded
     def bard_text(self, prompt, buffer, text,
                   notify_start, notify_end, begin=0, end=0, func=""):
-        print(prompt, "\n", buffer, "\n", text, "\n", begin, "\n", end, "\n", notify_start, "\n", notify_end, "\n", func)
         message_emacs(notify_start)
         answers = list()
 
