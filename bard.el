@@ -497,9 +497,8 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
 		     "Refactory code done.")))
 
 (unless bard-is-starting
-  (bard-start-process)
+  (bard-start-process))
 
 
 (provide 'bard)
-
 ;;; bard.el ends here
