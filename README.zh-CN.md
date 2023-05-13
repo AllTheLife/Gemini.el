@@ -38,11 +38,12 @@
 - `bard-explain-code` 解释 buffer 中的代码
 - `bard-comment-code` 为 buffer 中的代码添加注释
 - `bard-refactory-code` 重构 buffer 中的代码
+- `bard-generate-commit-message` 插入建议的提交信息
 
 ## 反馈问题
 请用命令 `emacs -Q` 并只添加 bard.el 配置做一个对比测试，如果 `emacs -Q` 可以正常工作，请检查你个人的配置文件。
 
-如果`emacs -Q`环境下问题依旧，请到[这里](https://github.com/AllTheLife/Bard.el/issues/new)反馈, 并附带 `*bard*` 窗口的内容给我们提交 issue，那里面有很多线索可以帮助我们排查问题。
+如果`emacs -Q`环境下问题依旧，请到[这里](https://github.com/AllTheLife/Bard.el/issues/new) 反馈, 并附带 `*bard*` 窗口的内容给我们提交 issue，那里面有很多线索可以帮助我们排查问题。
 
 由于开发者是面临这中考压力的中学牲，所以不保证 bug 能够及时修，也不保证 pull requests 可以及时接收，望见谅。
 
