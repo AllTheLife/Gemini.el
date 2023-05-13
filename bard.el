@@ -478,6 +478,14 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
 		     "Refactorying"
 		     "Refactory code done.")))
 
+(defun bard-generate-commit-message ()
+  (interactive)
+  (bard-call-async "git_commit"
+		   default-directory
+		   (buffer-name)
+		   (point)
+		   (point)))
+
 (unless bard-is-starting
   (bard-start-process))
 

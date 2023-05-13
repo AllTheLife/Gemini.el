@@ -27,7 +27,7 @@ from functools import wraps
 from Bard import Chatbot
 from epc.server import ThreadingEPCServer
 from utils import (close_epc_client, eval_in_emacs, get_emacs_var,
-                   message_emacs, init_epc_client, logger)
+                   message_emacs, init_epc_client, logger, get_command_result)
 
 
 def threaded(func):
@@ -138,6 +138,22 @@ class Bard:
             eval_in_emacs(func, answers[0], buffer, begin, end)
 
         message_emacs(notify_end)
+
+    @threaded
+    def git_commit(self, dir, buffer, begin, end):
+        message_emacs("Generating")
+
+        diff_string = get_command_result(f"cd {dir} ; git diff")
+        prompt = f"""
+Please generate a patch title for the following diff content, mainly analyze the content starting with - or + at the beginning of the line, with a concise and informative summary instead of a mechanical list. The title should not exceed 100 characters in length, and the format of the words in the title should be: the first word capitalized, all other words lowercase, unless they are proper nouns, if the diff content starts with 'Subproject commit', you extract the submodule name 'xxx', and reply 'Update xxx modules'.
+\n
+{ diff_string }
+"""
+        content = self.chatbot.ask(prompt)
+        content = content['content']
+        eval_in_emacs("bard-return-code", content, buffer, begin, end)
+
+        message_emacs("Generate messages done.")
 
     def cleanup(self):
         """Do some cleanup before exit python process."""
