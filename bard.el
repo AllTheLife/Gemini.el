@@ -481,7 +481,7 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
 (defun bard-generate-commit-message ()
   (interactive)
   (bard-call-async "git_commit"
-		   default-directory
+		   (vc-root-dir)
 		   (buffer-name)
 		   (point)
 		   (point)))
