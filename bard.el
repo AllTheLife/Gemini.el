@@ -89,6 +89,21 @@
   :type 'string
   :group 'bard)
 
+(defcustom bard-drafts (list)
+  "The drafts that Bard returned."
+  :type 'listp
+  :group 'bard)
+
+(defcustom bard-draft--begin 0
+  "Where the draft begins."
+  :type 'numberp
+  :group 'bard)
+
+(defcustom bard-draft--end 0
+  "Where the draft ends."
+  :type 'numberp
+  :group 'bard)
+
 (defvar bard-server nil
   "The Bard Server.")
 
@@ -264,19 +279,6 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
 		   prompt
 		   (buffer-name)))
 
-(defun bard-insert-answer (serial-number content buffer)
-  (save-excursion
-    (switch-to-buffer buffer)
-    (goto-char (point-max))
-    (insert "\n")
-    (let ((point (point-max)))
-      (goto-char point)
-      (insert (format "### Draft %d:\n" serial-number))
-      (insert content "\n")
-      (unless (equal serial-number 1)
-	(goto-char point)
-	(markdown-cycle)))))
-
 (defun bard-finish-answer (buffer)
   (save-excursion
     (switch-to-buffer buffer)
@@ -285,17 +287,18 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
     (message "[Bard] Bard finished replying.")))
 
 (defun bard-response (serial-number content buffer)
-  (with-current-buffer buffer
-    (save-excursion
-      (goto-char (point-max))
-      (unless (= serial-number 1)
-	(insert "\n"))
-      (let ((point (point-max)))
-	(insert (format "### Draft %d:\n" serial-number))
-	(insert content "\n")
-	(unless (equal serial-number 1)
-	  (goto-char point)
-	  (markdown-cycle))))))
+  (if (equal serial-number 1)
+      (progn
+	(setq bard-drafts (list))
+	(push content bard-drafts)
+	(with-current-buffer buffer
+	  (save-excursion
+	    (goto-char (point-max))
+	    (insert "\n### Bard:\n")
+	    (setq bard-draft--begin (point-max))
+	    (insert content)
+	    (setq bard-draft--end (point-max)))))
+    (push content bard-drafts)))
 
 (define-derived-mode bard-edit-mode text-mode "bard/edit"
   "The major mode to edit focus text input.")
@@ -354,15 +357,22 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
     (switch-to-buffer bufname)
     (bard-chat-with-message prompt)))
 
-(defun bard-return-code (content buffer begin end)
+(defun bard-return-code (serial-number content buffer begin end)
   (let* ((block-start (string-match "```" content))
-	 (code-begin (string-match "\n" content (+ block-start 3)))
-	 (code-end (string-match "```" content code-begin)))
-    (with-current-buffer buffer
-      (setq code-begin (+ code-begin 1))
-      (delete-region begin end)
-      (goto-char begin)
-      (insert (substring content code-begin code-end)))))
+	 (code-begin (+ (string-match "\n" content (+ block-start 3)) 1))
+	 (code-end (string-match "```" content code-begin))
+	 (code (substring content code-begin code-end)))
+    (if (equal serial-number 1)
+	(progn
+	  (setq bard-drafts (list))
+	  (push code bard-drafts)
+	  (with-current-buffer buffer
+	    (delete-region begin end)
+	    (goto-char begin)
+	    (setq bard-draft--begin begin)
+	    (insert code)
+	    (setq bard-draft--end (+ bard-draft--begin (length code)))))
+      (push code bard-drafts))))
 
 (defun bard-generate-code ()
   (interactive)
@@ -372,7 +382,6 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
          (prompt (if (= (length selection) 0)
                      (format "%s, please only output the code, without any explanations or instructions." (read-string "Prompt: "))
                    (format "%s, please only output the code, without any explanations or instructions." (concat mode " " selection)))))
-    (insert "\n")
     (bard-call-async "bard_text"
 		     prompt
                      (buffer-name)
@@ -394,7 +403,7 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
 		     prompt
                      (buffer-name)
                      selection
-                     "Adgjusting."
+                     "Adgjusting..."
                      "Adjust code done."
                      (region-beginning)
                      (region-end)
@@ -415,7 +424,7 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
 		     "Please help me proofread and polish the following text:\n"
 		     (buffer-name)
 		     document
-		     "Polishing."
+		     "Polishing..."
 		     "Polish document done.")))
 
 (defun bard-explain-code ()
@@ -434,7 +443,7 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
 		     (format "Please explain in detail the meaning of the following %s code, leave a blank line between each sentence:\n" mode)
 		     (buffer-name)
 		     code
-		     "Explaining"
+		     "Explaining..."
 		     "Explain code done.")))
 
 (defun bard-comment-code ()
@@ -453,7 +462,7 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
 		     (format "Please add code comments to the following %s code, with the comments written in English within the code, and output the code including the comments." mode)
 		     (buffer-name)
 		     code
-		     "Commenting"
+		     "Commenting..."
 		     "Comment code done."
 		     begin
 		     end
@@ -475,7 +484,7 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
 		     (format "Please help me refactor the following %s code. Please reply with the refactoring explanation, refactored code, and diff between two versions. Please ignore the comments and strings in the code during the refactoring. If the code remains unchanged after refactoring, please say 'No need to refactor'." mode)
 		     (buffer-name)
 		     code
-		     "Refactorying"
+		     "Refactorying..."
 		     "Refactory code done.")))
 
 (defun bard-generate-commit-message ()
@@ -485,6 +494,14 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
 		   (buffer-name)
 		   (point)
 		   (point)))
+
+(defun bard-choose-drafts (draft)
+  (interactive (list (completing-read "Choose Draft: " bard-drafts nil t)))
+  (delete-region bard-draft--begin bard-draft--end)
+  (save-excursion
+    (goto-char bard-draft--begin)
+    (insert draft))
+  (setq bard-draft--end (+ bard-draft--begin (length draft))))
 
 (unless bard-is-starting
   (bard-start-process))

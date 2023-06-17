@@ -105,7 +105,7 @@ class Bard:
 
         serial_number = 1
         for answer in answers:
-            eval_in_emacs("bard-insert-answer", serial_number, answer, buffer)
+            eval_in_emacs("bard-response", serial_number, answer, buffer)
             serial_number += 1
 
         eval_in_emacs("bard-finish-answer", buffer)
@@ -123,35 +123,41 @@ class Bard:
 
         responses = self.chatbot.ask(content)
 
-        if func == "":
-            responses = responses['choices']
+        responses = responses['choices']
 
-            for response in responses:
-                answers.append(response['content'][0])
+        for response in responses:
+            answers.append(response['content'][0])
 
-            serial_number = 1
-            for answer in answers:
+        serial_number = 1
+        for answer in answers:
+            if func == "":
                 eval_in_emacs("bard-response", serial_number, answer, buffer)
-                serial_number += 1
-        else:
-            answers.append(responses['content'])
-            eval_in_emacs(func, answers[0], buffer, begin, end)
+            else:
+                eval_in_emacs(func, serial_number, answer, buffer, begin, end)
+            serial_number += 1
 
         message_emacs(notify_end)
 
     @threaded
     def git_commit(self, dir, buffer, begin, end):
-        message_emacs("Generating")
+        message_emacs("Generating...")
 
         diff_string = get_command_result(f"cd {dir} ; git diff")
+        answers = list()
         prompt = f"""
 Please generate a patch title for the following diff content, mainly analyze the content starting with - or + at the beginning of the line, with a concise and informative summary instead of a mechanical list. The title should not exceed 100 characters in length, and the format of the words in the title should be: the first word capitalized, all other words lowercase, unless they are proper nouns, if the diff content starts with 'Subproject commit', you extract the submodule name 'xxx', and reply 'Update xxx modules'. Please just put the commit message in code block and don't give any explanations or instructions.
 \n
 { diff_string }
 """
-        content = self.chatbot.ask(prompt)
-        content = content['content']
-        eval_in_emacs("bard-return-code", content, buffer, begin, end)
+        responses = self.chatbot.ask(prompt)
+        responses = responses['choices']
+        for response in responses:
+            answers.append(response['content'][0])
+
+        serial_number = 1
+        for answer in answers:
+            eval_in_emacs("bard-return-code", serial_number, answer, buffer, begin, end)
+            serial_number += 1
 
         message_emacs("Generate messages done.")
 
