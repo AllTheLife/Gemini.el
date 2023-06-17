@@ -40,6 +40,9 @@ Enjoy using Google Bard in Emacs😀
 - `bard-refactory-code` refactors the code in the buffer
 - `bard-generate-commit-message` insert the commit message
 
+### Drafts
+- Just `M-x bard-choose-drafts` and jump to the draft you like!
+
 ## Feedback
 Please use the command `emacs -Q` and only add the bard.el configuration to do a comparative test. If `emacs -Q` can work normally, please check your personal configuration file.
 

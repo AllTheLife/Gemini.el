@@ -40,6 +40,9 @@
 - `bard-refactory-code` 重构 buffer 中的代码
 - `bard-generate-commit-message` 插入建议的提交信息
 
+### 选择回答
+- 只需要 `M-x bard-choose-drafts`!
+
 ## 反馈问题
 请用命令 `emacs -Q` 并只添加 bard.el 配置做一个对比测试，如果 `emacs -Q` 可以正常工作，请检查你个人的配置文件。
 
