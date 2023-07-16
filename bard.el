@@ -113,6 +113,15 @@
 
 (defvar bard-server-port nil)
 
+(defvar bard-lang (or (ignore-errors (car (split-string (getenv "LANG") "\\.")))
+                      (car (split-string current-language-environment "-"))))
+
+(defun bard-output-lang ()
+  (pcase bard-lang
+    ("zh_CN" "中文")
+    ("Chinese" "中文")
+    (_ "English")))
+
 (add-to-list 'auto-mode-alist '("\\.bard$" . markdown-mode))
 
 (defun bard--start-epc-server ()
@@ -397,7 +406,7 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
   (let* ((selection (if (region-active-p)
                         (string-trim (buffer-substring-no-properties (region-beginning) (region-end)))))
          (mode (replace-regexp-in-string "\\(-ts\\)?-mode$" "" (symbol-name major-mode)))
-         (prompt (format "%s in the %s code below, please only output the code, without any explanations or instructions."
+         (prompt (format "%s the %s code below, please only output the code, without any explanations or instructions."
 			 (read-string "Adjust: ") mode)))
     (bard-call-async "bard_text"
 		     prompt
@@ -440,7 +449,7 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
     (markdown-mode)
     (delete-region (point-min) (point-max))
     (bard-call-async "bard_text"
-		     (format "Please explain in detail the meaning of the following %s code, leave a blank line between each sentence:\n" mode)
+		     (format "Please explain in detail the meaning of the following %s code, in %s, leave a blank line between each sentence:\n" mode (bard-output-lang))
 		     (buffer-name)
 		     code
 		     "Explaining..."
@@ -459,7 +468,7 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
 		(point-max)))
 	 (mode (replace-regexp-in-string "\\(-ts\\)?-mode$" "" (symbol-name major-mode))))
     (bard-call-async "bard_text"
-		     (format "Please add code comments to the following %s code, with the comments written in English within the code, and output the code including the comments." mode)
+		     (format "Please add code comments to the following %s code, with the comments written in %s within the code, and output the code including the comments." mode (bard-output-lang))
 		     (buffer-name)
 		     code
 		     "Commenting..."
@@ -474,14 +483,14 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
 			(string-trim (buffer-substring-no-properties (region-beginning) (region-end)))
 		      (string-trim (buffer-substring-no-properties (point-min) (point-max)))))
 	 (mode (replace-regexp-in-string "\\(-ts\\)?-mode$" "" (symbol-name major-mode)))
-	 (buffer (generate-new-buffer (format "*bard-explain-buffer*"))))
+	 (buffer (generate-new-buffer (format "*bard-refactory-buffer*"))))
     (split-window-right)
     (other-window 1)
     (switch-to-buffer buffer)
     (markdown-mode)
     (delete-region (point-min) (point-max))
     (bard-call-async "bard_text"
-		     (format "Please help me refactor the following %s code. Please reply with the refactoring explanation, refactored code, and diff between two versions. Please ignore the comments and strings in the code during the refactoring. If the code remains unchanged after refactoring, please say 'No need to refactor'." mode)
+		     (format "Please help me refactor the following %s code, in %s. Please reply with the refactoring explanation, refactored code, and diff between two versions. Please ignore the comments and strings in the code during the refactoring. If the code remains unchanged after refactoring, please say 'No need to refactor'." mode (bard-output-lang))
 		     (buffer-name)
 		     code
 		     "Refactorying..."
@@ -494,6 +503,42 @@ Then Bard will start by gdb, please send new issue with `*bard*' buffer content 
 		   (buffer-name)
 		   (point)
 		   (point)))
+
+(defun bard-translate-into-chinese ()
+  (interactive)
+  (let* ((buffer (generate-new-buffer (format "*bard-translate-buffer*")))
+	 (content (if (region-active-p)
+		      (string-trim (buffer-substring-no-properties (region-beginning) (region-end)))
+		    (string-trim (buffer-substring-no-properties (point-min) (point-max))))))
+    (split-window-right)
+    (other-window 1)
+    (switch-to-buffer buffer)
+    (markdown-mode)
+    (delete-region (point-min) (point-max))
+    (bard-call-async "bard_text"
+		     (format "请把下面的文段翻译成中文:\n%s" content)
+		     (buffer-name)
+		     content
+		     "Translating..."
+		     "Translate text done.")))
+
+(defun bard-translate-into-english ()
+  (interactive)
+  (let* ((buffer (generate-new-buffer (format "*bard-translate-buffer*")))
+	 (content (if (region-active-p)
+		      (string-trim (buffer-substring-no-properties (region-beginning) (region-end)))
+		    (string-trim (buffer-substring-no-properties (point-min) (point-max))))))
+    (split-window-right)
+    (other-window 1)
+    (switch-to-buffer buffer)
+    (markdown-mode)
+    (delete-region (point-min) (point-max))
+    (bard-call-async "bard_text"
+		     (format "Please translate the following passage into English:\n%s" content)
+		     (buffer-name)
+		     content
+		     "Translating..."
+		     "Translate text done.")))
 
 (defun bard-choose-drafts (draft)
   (interactive (list (completing-read "Choose Draft: " bard-drafts nil t)))

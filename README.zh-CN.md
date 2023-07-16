@@ -27,10 +27,11 @@
 
 ### 聊天
 - 新建 `*.bard` 文件，通过 `bard-chat` 或 `bard-chat-with-multiline` 来与 Bard 聊天
-**tips**: Bard 目前仅支持英文
 
 ### 修改文档
 - `bard-polish-document` 润色或填充文章内容
+- `bard-translate-into-chinese` 把选段翻译成中文
+- `bard-translate-into-english` 把选段翻译成英文
 
 ### Coding
 - `bard-generate-code` 根据选中内容或输入生成代码

@@ -27,10 +27,11 @@ Enjoy using Google Bard in Emacs😀
 
 ### Chatting
 - Create a `*.bard` file and chat with Bard using `bard-chat` or `bard-chat-with-multiline`
-**tips**: Bard currently only supports English
 
 ### Document Editing
 - `bard-polish-document` polishes or fills in the content of the article
+- `bard-translate-into-chinese` Translate the passage into Chinese.
+- `bard-translate-into-english` Translate the passage into English.
 
 ### Coding
 - `bard-generate-code` generates code based on selected content or input
