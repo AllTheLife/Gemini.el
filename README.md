@@ -8,16 +8,19 @@ Enjoy using Google Bard in Emacs😀
 2. Have a Google account and access to Bard
 
 ## Installation
-1. Open https://bard.google.com, press `F12` to open the console, select Applications -> Cookie, and copy the value of `__Secure-1PSID` (be careful not to copy it incorrectly)
-2. Set the environment variable BARD_TOKEN to the value you just copied
-(or save its value to `~/.emacs.d/bard/bard_cookie_token.txt`)
+1. Go to https://bard.google.com/
+    - F12 for console
+    - Copy the values
+      - Session: Go to Application → Cookies → `__Secure-1PSID` and `__Secure-1PSIDTS`. Copy the value of those cookie.
+2. Set the environment variable BARD_TOKEN (`__Secure-1PSID`) and BARD_TOKEN_TS (`__Secure-1PSIDTS`) to the value you just copied
+(or save its value to `~/.emacs.d/bard/bard_cookie_token.txt` with format: `__Secure-1PSIDTS`,`__Secure-1PSIDTS`)
 3. Install Python dependencies: `pip install epc sexpdata GoogleBard`
 4. Install [markdown-mode](https://github.com/jrblevin/markdown-mode)
 5. Use `git clone` to download this repository and replace the `load-path` path in the configuration below
 6. Add the following code to your configuration file `~/.emacs`:
 ```elisp
 (add-to-list 'load-path "<path-to-bard>")
-
+;; (setq bard-http-proxy "http://localhost:port") ;; You may need to set up a proxy if you are not in a region or country Google Bard allowed.
 (require 'bard)
 ```
 

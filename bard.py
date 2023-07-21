@@ -52,9 +52,11 @@ class Bard:
         self.server.register_instance(self)  # register instance functions let elisp side call
 
         # self.token = get_emacs_var("bard-cookie-token")
-        self.token = self.get_cookie_token()
+        self.token, self.token_ts = self.get_cookie_token()
 
-        self.chatbot = Chatbot(self.token)
+        self.proxy = self.get_emacs_proxy_config()
+
+        self.chatbot = Chatbot(self.token, self.token_ts, proxy=self.proxy)
 
         # Start EPC server with sub-thread, avoid block main loop.
         self.server_thread = threading.Thread(target=self.server.serve_forever)
@@ -78,21 +80,31 @@ class Bard:
         except:
             logger.error(traceback.format_exc())
 
+    def get_emacs_proxy_config(self):
+        proxy = get_emacs_var("bard-http-proxy")
+        return proxy if proxy != "" else None
+
     def get_cookie_token(self):
         bard_cookie_token_file_path = os.path.expanduser(get_emacs_var("bard-cookie-token-path"))
         cookie_token = None
+        cookie_token_ts = None
         if os.path.exists(bard_cookie_token_file_path):
             with open(bard_cookie_token_file_path, "r") as f:
-                key = f.read().strip()
-                if key != "":
-                    cookie_token = key
+                try:
+                    token, ts = f.read().strip().split(",", 2)
+                    if token != "" and ts != "":
+                        cookie_token = token
+                        cookie_token_ts = ts
+                except Exception as e:
+                    message_emacs(f"Bard cookie token and token_ts not found: {str(e)}")
         else:
             cookie_token = os.environ.get("BARD_TOKEN")
+            cookie_token_ts = os.environ.get("BARD_TOKEN_TS")
 
-        if cookie_token is None:
-            message_emacs("Bard cookie token not found, please check the README.")
+        if cookie_token is None or cookie_token_ts is None:
+            message_emacs("Bard cookie token or token_ts not found, please check the README.")
 
-        return cookie_token
+        return cookie_token, cookie_token_ts
 
     @threaded
     def bard_chat(self, prompt, buffer):
