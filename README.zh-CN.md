@@ -8,16 +8,19 @@
 2. 拥有 Google 账号并拥有访问 Bard 的权限
 
 ## 安装
-1. 打开 https://bard.google.com , 按下 `F12` 打开 console，选择 Applications -> Cookie，复制`__Secure-1PSID`的值（注意不要复制错了）
-2. 设置环境变量 BARD_TOKEN 为刚才复制的值
-（或者将其值保存到 `~/.emacs.d/bard/bard_cookie_token.txt`）
+1. 打开 https://bard.google.com , 
+   - 按下 `F12` 打开 console
+   - 选择 Applications -> Cookies
+     - 复制`__Secure-1PSID` 和 `__Secure-1PSIDTS` 的值（注意不要复制错了）
+2. 设置环境变量 `BARD_TOKEN` 和 `BARD_TOKEN_TS` 为刚才复制的值
+（或者将其值保存到 `~/.emacs.d/bard/bard_cookie_token.txt`， 格式为：`__Secure-1PSID`,`__Secure-1PSIDTS`）
 3. 安装 Python 依赖：`pip install epc sexpdata GoogleBard`
 4. 安装 [markdown-mode](https://github.com/jrblevin/markdown-mode)
 5. 使用 `git clone` 下载此仓库，并替换下面配置中的 `load-path` 路径
 6. 将以下代码添加到您的配置文件 `~/.emacs` 中：
 ```elisp
 (add-to-list 'load-path "<path-to-bard>")
-
+;; (setq bard-http-proxy "http://localhost:port") ;; You may need to set up a proxy if you are not in a region or country Google Bard allowed.
 (require 'bard)
 ```
 
