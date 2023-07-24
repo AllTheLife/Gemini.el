@@ -8,7 +8,7 @@
 2. 拥有 Google 账号并拥有访问 Bard 的权限
 
 ## 安装
-1. 打开 https://bard.google.com , 
+1. 打开 https://bard.google.com ,
    - 按下 `F12` 打开 console
    - 选择 Applications -> Cookies
      - 复制`__Secure-1PSID` 和 `__Secure-1PSIDTS` 的值（注意不要复制错了）
@@ -62,6 +62,6 @@
 
 ## 贡献者
 
-<a href = "https://github.com/AllTheLife//graphs/contributors">
+<a href = "https://github.com/AllTheLife/Bard.el/graphs/contributors">
   <img src = "https://contrib.rocks/image?repo=AllTheLife/Bard.el"/>
 </a>

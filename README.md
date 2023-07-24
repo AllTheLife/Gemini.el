@@ -62,6 +62,6 @@ If there are any big shots willing to contribute some code, it will be greatly a
 
 ## Contributors
 
-<a href = "https://github.com/AllTheLife//graphs/contributors">
+<a href = "https://github.com/AllTheLife/Bard.el/graphs/contributors">
   <img src = "https://contrib.rocks/image?repo=AllTheLife/Bard.el"/>
 </a>
