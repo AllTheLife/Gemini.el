@@ -171,6 +171,10 @@
   "The Python interpreter used to run bard.py"
   :type 'string)
 
+(defcustom bard-http-proxy ""
+  "A proxy to access bard.google.com. "
+  :type 'string)
+
 (defcustom bard-enable-debug nil
   "If you got segfault error, please turn this option.
 Then Bard will start by gdb, please send new issue with `*bard*' buffer content when next crash."
