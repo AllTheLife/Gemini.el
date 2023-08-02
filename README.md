@@ -24,6 +24,16 @@ Enjoy using Google Bard in Emacs😀
 (require 'bard)
 ```
 
+### Automatic Cookie Extraction
+
+In addition to reading the `BARD_TOKEN` and `BARD_TOKEN_TS` environment variables or configuration file, `Bard.el` can now automatically extract the cookies from your browser. This is useful if you don't want to manually set the environment variables.
+
+To use this feature, you need to install the `browser_cookie3` Python package. Once you have installed the package, you can run the following command to extract the cookies:
+
+`pip install browser-cookie3`
+
+**Note:** If you are using a browser that is not supported by [browser_cookie3](https://github.com/borisbabic/browser_cookie3), you will need to manually set the `BARD_TOKEN` and `BARD_TOKEN_TS`.
+
 ## Usage
 
 *Note*: Bard currently has limited language support, so some commands cannot be implemented temporarily.
