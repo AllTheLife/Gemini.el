@@ -24,6 +24,16 @@
 (require 'bard)
 ```
 
+### 自动提取 cookie
+
+除了从环境变量或配置文件中读取 `BARD_TOKEN` 和 `BARD_TOKEN_TS` 之外，`Bard.el` 现在还可以自动从您的浏览器中提取 cookie。这对于不想手动设置环境变量的人来说很有用。
+
+要使用此功能，您需要安装 `browser_cookie3` Python 包。安装了该包后，您可以运行以下命令来提取 cookie：
+
+`pip install browser-cookie3`
+
+**注意：** 如果您使用的是 `browser_cookie3` 不支持的浏览器，则还是需要手动设置 `BARD_TOKEN` 和 `BARD_TOKEN_TS`。
+
 ## 使用
 
 *声明* : Bard 目前支持的语言有限，故部分命令暂时无法实现

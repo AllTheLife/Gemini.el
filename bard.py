@@ -39,6 +39,51 @@ def threaded(func):
             args[0].thread_queue.append(thread)
     return wrapper
 
+def browser_cookies():
+    import browser_cookie3
+    cookiejar = None
+    cookie_token = None
+    cookie_token_ts = None
+    google_com = "google.com"
+
+    try:
+        cookiejar = browser_cookie3.chrome(domain_name=google_com)
+    except Exception as e:
+        print(f"get cookie from Chrome failed, {str(e)}", file=sys.stderr)
+
+    if not cookiejar:
+        try:
+            cookiejar = browser_cookie3.chromium(domain_name=google_com)
+        except Exception as e:
+            print(f"get cookie from Chromium failed, {str(e)}", file=sys.stderr)
+
+    if not cookiejar:
+        try:
+            cookiejar = browser_cookie3.brave(domain_name=google_com)
+        except Exception as e:
+            print(f"get cookie from Brave failed, {str(e)}", file=sys.stderr)
+
+    if not cookiejar:
+        try:
+            cookiejar = browser_cookie3.firefox(domain_name=google_com)
+        except Exception as e:
+            print(f"get cookie from Firefox failed, {str(e)}", file=sys.stderr)
+
+    if not cookiejar:
+        try:
+            cookiejar = browser_cookie3.edge(domain_name=google_com)
+        except Exception as e:
+            print(f"get cookie from Microsoft Edge failed, {str(e)}", file=sys.stderr)
+            return None, None
+
+    for cookie in cookiejar:
+        if cookie.name == "__Secure-1PSID":
+            cookie_token = cookie.value
+
+        if cookie.name == "__Secure-1PSIDTS":
+            cookie_token_ts = cookie.value
+
+    return cookie_token, cookie_token_ts
 
 class Bard:
     def __init__(self, args):
@@ -100,6 +145,14 @@ class Bard:
         else:
             cookie_token = os.environ.get("BARD_TOKEN")
             cookie_token_ts = os.environ.get("BARD_TOKEN_TS")
+
+        if cookie_token is None or cookie_token_ts is None:
+            try:
+                import browser_cookie3
+                message_emacs("No available cookie value read from configuration. Trying to automatically extract cookies from the browser")
+                cookie_token, cookie_token_ts = browser_cookies()
+            except ImportError:
+                pass
 
         if cookie_token is None or cookie_token_ts is None:
             message_emacs("Bard cookie token or token_ts not found, please check the README.")
