@@ -77,6 +77,10 @@ def browser_cookies():
             return None, None
 
     for cookie in cookiejar:
+
+        if cookie_token and cookie_token_ts:
+            break
+
         if cookie.name == "__Secure-1PSID":
             cookie_token = cookie.value
 
