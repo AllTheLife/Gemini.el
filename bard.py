@@ -84,7 +84,7 @@ def browser_cookies():
         if cookie.name == "__Secure-1PSID":
             cookie_token = cookie.value
 
-        if cookie.name == "__Secure-1PSIDTS":
+        if cookie.name == "__Secure-1PSIDCC":
             cookie_token_ts = cookie.value
 
     return cookie_token, cookie_token_ts
