@@ -95,10 +95,10 @@ class Gemini:
 
     @threaded
     def gemini_chat(self, prompt, buffer):
-        content = self.chatbot.send_message(prompt)
+        response = self.chatbot.send_message(prompt)
         answers = list()
 
-        answers.append(content.text)
+        answers.append(response.text)
 
         serial_number = 1
         for answer in answers:
@@ -118,12 +118,9 @@ class Gemini:
         else:
             content = f"{prompt}:\n{text}"
 
-        responses = self.chatbot.send_message(content)
+        response = self.chatbot.send_message(content)
 
-        responses = responses['choices']
-
-        for response in responses:
-            answers.append(response['content'][0])
+        answers.append(response.text)
 
         serial_number = 1
         for answer in answers:
@@ -146,10 +143,8 @@ Please generate a patch title for the following diff content, mainly analyze the
 \n
 { diff_string }
 """
-        responses = self.chatbot.send_message(prompt)
-        responses = responses['choices']
-        for response in responses:
-            answers.append(response['content'][0])
+        response = self.chatbot.send_message(prompt)
+        answers.append(response.text)
 
         serial_number = 1
         for answer in answers:
