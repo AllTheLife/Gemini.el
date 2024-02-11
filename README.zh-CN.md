@@ -2,12 +2,10 @@
 
 ### Gemini:
 # Gemini.el
-在 Emacs 中享受使用 Google Gemini 😀
-
-*注意*：这是一个修改过的[Bard.el](https://github.com/AllTheLife/Bard.el)版本， 用 Gemini 取代了 Bard。
+享受在 Emacs 中使用 Google Gemini 的快乐吧😀
 
 ## 依赖项
-1. 拥有 Google 帐户并可以访问 Gemini
+1. 拥有 Google 账号并拥有访问 Gemini 的权限
 
 ## 安装
 1. 您需要准备好您的 Google Gemini API 令牌。
@@ -16,7 +14,7 @@
 
 ## 用法
 
-*注意*：Gemini 目前支持的语言有限，因此某些命令暂时无法实现。
+*声明* : Gemini 目前支持的语言有限，故部分命令暂时无法实现
 
 ### 聊天
 - 创建一个 markdown 文件（`*.mk` 或 `*.gemini`），并使用 `gemini-chat` 或 `gemini-chat-with-multiline` 与 Gemini 聊天
@@ -36,3 +34,22 @@
 
 ### 草稿
 - 只需 `M-x gemini-choose-drafts` 并跳转到您喜欢的草稿即可！
+
+## 反馈问题
+请用命令 `emacs -Q` 并只添加 gemini.el 配置做一个对比测试，如果 `emacs -Q` 可以正常工作，请检查你个人的配置文件。
+
+如果`emacs -Q`环境下问题依旧，请到[这里](https://github.com/AllTheLife/Gemini.el/issues/new) 反馈, 并附带 `*bard*` 窗口的内容给我们提交 issue，那里面有很多线索可以帮助我们排查问题。
+
+由于开发者是面临这中考压力的中学牲，所以不保证 bug 能够及时修，也不保证 pull requests 可以及时接收，望见谅。
+
+如果有大佬愿意贡献一些代码，将感激不尽。
+
+## 鸣谢
+- 感谢 @manateelazycat 大佬的 [mind-wave](https://github.com/manateelazycat/mind-wave)，本仓库的大部分代码都来自于这里，它优美的代码对这个插件的开发提供了巨大帮助
+- 感谢 @acheong08 大佬开发的优秀的 [API](https://github.com/acheong08/Bard)
+
+## 贡献者
+
+<a href = "https://github.com/AllTheLife/Gemini.el/graphs/contributors">
+  <img src = "https://contrib.rocks/image?repo=AllTheLife/Gemini.el"/>
+</a>

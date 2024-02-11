@@ -1,8 +1,8 @@
 ;;; gemini-epcs.el --- EPC Server              -*- lexical-binding: t -*-
 
-;; Copyright (C) 2024 Enze Chi
+;; Copyright (C) 2011,2012,2013  Masashi Sakurai
 
-;; Author: Enze Chi <Enze.Chi@gmail.com>
+;; Author: Masashi Sakurai <m.sakurai at kiwanami.net>
 ;; Keywords: lisp
 
 ;; This program is free software; you can redistribute it and/or modify

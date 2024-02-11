@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2024 Enze Chi
+# Copyright (C) 2023 AllTheLife
 #
-# Author:     Enze Chi <Enze.Chi@gmailcom>
-# Maintainer: Enze Chi <Enze.Chi@gmailcom>
+# Author:     AllTheLife <xjn208930@gmail.com>
+# Maintainer: AllTheLife <xjn208930@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

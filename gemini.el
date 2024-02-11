@@ -2,11 +2,13 @@
 
 ;; Filename: gemini.el
 ;; Description: Gemini in Emacs
-;; Author: Enze Chi <Enze Chi@gmail.com>
-;; Maintainer: Enze Chi <Enze Chi@gmail.com>
-;; Copyright (C) 2024 Enze Chi
-;; Version: 0.1
-
+;; Author: AllTheLife <xjn208930@gmail.com>
+;; Maintainer: AllTheLife <xjn208930@gmail.com>
+;; Copyright (C) 2023, AllTheLife, all rights reserved.
+;; Created: 2023-04-28 19:03:14
+;; Version: 0.4
+;; Last-Updated: 2023-06-17 19:04:39
+;;           By: AllTheLife
 ;; URL:
 ;; Keywords:
 ;; Compatibility: emacs-version >= 28
@@ -54,8 +56,18 @@
 ;;; Change log:
 ;;
 ;;
+;;
+;; All of the above can customize by:
+;;      M-x customize-group RET bard RET
+;;
+
 
 ;;; Acknowledgements:
+;;
+;;
+
+;;; TODO
+;;
 ;;
 ;;
 
