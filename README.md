@@ -7,7 +7,10 @@ Enjoy using Google Gemini in Emacs😀
 1. Have a Google account and access to Gemini
 
 ## Installation
-1. You need to have your Google Gemini API token ready.
+1. You need to have your Google Gemini API token ready. You can get an API key via [Google AI Studio](https://makersuite.google.com/app/apikey).
+```
+(setq gemini-api-token "your api token")
+```
 2. Install Python dependencies: `pip install epc sexpdata google-generativeai`
 3. Install [markdown-mode](https://github.com/jrblevin/markdown-mode)
 ```

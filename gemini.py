@@ -54,7 +54,7 @@ class Gemini:
 
         self.token = self.get_token()
 
-        # self.proxy = self.get_emacs_proxy_config()
+        genai.configure(api_key=self.token)
 
         self.model = genai.GenerativeModel('gemini-pro')
 

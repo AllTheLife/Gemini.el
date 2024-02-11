@@ -8,7 +8,10 @@
 1. 拥有 Google 账号并拥有访问 Gemini 的权限
 
 ## 安装
-1. 您需要准备好您的 Google Gemini API 令牌。
+1. 你需要准备好你的 Google Gemini API 令牌。你可以通过 [Google AI Studio](https://makersuite.google.com/app/apikey) 获取一个 API 密钥。
+```
+(setq gemini-api-token "your api token")
+```
 2. 安装 Python 依赖项：`pip install epc sexpdata google-generativeai`
 3. 安装 [markdown-mode](https://github.com/jrblevin/markdown-mode)
 
