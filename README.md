@@ -7,15 +7,26 @@ Enjoy using Google Gemini in Emacs😀
 1. Have a Google account and access to Gemini
 
 ## Installation
+
+This package will not be uploaded to melpa, thanks for your understanding.
+
+1.  Firstly, clone this repository `git clone https://github.com/AllTheLife/Gemini.el <path-to-site-lisp>`
+2.  Load the package in emacs
+```lisp
+(add-to-list 'load-path "<path-to-gemini>")
+(require 'gemini)
+```
+
+Et voilà 🎉
+
+## Usage
+
 1. You need to have your Google Gemini API token ready. You can get an API key via [Google AI Studio](https://makersuite.google.com/app/apikey).
 ```
 (setq gemini-api-token "your api token")
 ```
 2. Install Python dependencies: `pip install epc sexpdata google-generativeai`
 3. Install [markdown-mode](https://github.com/jrblevin/markdown-mode)
-```
-
-## Usage
 
 *Note*: Gemini currently has limited language support, so some commands cannot be implemented temporarily.
 
@@ -49,7 +60,6 @@ If there are any big shots willing to contribute some code, it will be greatly a
 
 ## Acknowledgments
 - Thanks to @manateelazycat for the beautiful code of [mind-wave](https://github.com/manateelazycat/mind-wave). Most of the code in this repository comes from here, which has greatly helped the development of this plugin.
-- Thanks to @acheong08 for the excellent [API](https://github.com/acheong08/Bard) developed.
 
 ## Contributors
 

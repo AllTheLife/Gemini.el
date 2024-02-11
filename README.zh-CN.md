@@ -8,14 +8,26 @@
 1. 拥有 Google 账号并拥有访问 Gemini 的权限
 
 ## 安装
+
+本 package 将不会上传至melpa，谢谢理解
+
+1. 克隆本仓库 `git clone https://github.com/AllTheLife/Gemini.el <path-to-site-lisp>`
+2. 在emacs中加载本package
+``` lisp
+(add-to-list 'load-path "<path-to-gemini>")
+(require 'gemini)
+```
+
+大功告成🎉
+
+## 用法
+
 1. 你需要准备好你的 Google Gemini API 令牌。你可以通过 [Google AI Studio](https://makersuite.google.com/app/apikey) 获取一个 API 密钥。
 ```
 (setq gemini-api-token "your api token")
 ```
 2. 安装 Python 依赖项：`pip install epc sexpdata google-generativeai`
 3. 安装 [markdown-mode](https://github.com/jrblevin/markdown-mode)
-
-## 用法
 
 *声明* : Gemini 目前支持的语言有限，故部分命令暂时无法实现
 
@@ -49,7 +61,6 @@
 
 ## 鸣谢
 - 感谢 @manateelazycat 大佬的 [mind-wave](https://github.com/manateelazycat/mind-wave)，本仓库的大部分代码都来自于这里，它优美的代码对这个插件的开发提供了巨大帮助
-- 感谢 @acheong08 大佬开发的优秀的 [API](https://github.com/acheong08/Bard)
 
 ## 贡献者
 
