@@ -16,17 +16,21 @@ This package will not be uploaded to melpa, thanks for your understanding.
 (add-to-list 'load-path "<path-to-gemini>")
 (require 'gemini)
 ```
+3. You need to have your Google Gemini API token ready. You can get an API key via [Google AI Studio](https://makersuite.google.com/app/apikey).
+```
+(setq gemini-api-token "your api token")
+```
+4. Start gemini process
+```
+(gemini-start-process)
+```
 
 Et voilà 🎉
 
 ## Usage
 
-1. You need to have your Google Gemini API token ready. You can get an API key via [Google AI Studio](https://makersuite.google.com/app/apikey).
-```
-(setq gemini-api-token "your api token")
-```
-2. Install Python dependencies: `pip install epc sexpdata google-generativeai`
-3. Install [markdown-mode](https://github.com/jrblevin/markdown-mode)
+1. Install Python dependencies: `pip install epc sexpdata google-generativeai`
+2. Install [markdown-mode](https://github.com/jrblevin/markdown-mode)
 
 *Note*: Gemini currently has limited language support, so some commands cannot be implemented temporarily.
 
