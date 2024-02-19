@@ -21,7 +21,11 @@
 ```
 (setq gemini-api-token "your api token")
 ```
-4. 启动Gemini进程
+4. (可选）如果您所在地区或国家不允许使用 Google Gemini，或者为了加速 Google API 请求，您可能需要设置代理。
+```
+(setq gemini-http-proxy "http://localhost:port")
+```
+5. 启动Gemini进程
 ```
 (gemini-start-process)
 ```

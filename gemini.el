@@ -229,7 +229,11 @@ Then Gemini will start by gdb, please send new issue with `*gemini*' buffer cont
         (setq gemini-internal-process-args gemini-args))
 
       ;; Start python process.
-      (let ((process-connection-type t))
+      (let ((process-connection-type t)
+            (process-environment (cl-copy-list process-environment)))
+        (when (not (string-empty-p (string-trim gemini-http-proxy)))
+          (setenv "http_proxy" gemini-http-proxy)
+          (setenv "https_proxy" gemini-http-proxy))
         (setq gemini-internal-process
               (apply 'start-process
                      gemini-name gemini-name
