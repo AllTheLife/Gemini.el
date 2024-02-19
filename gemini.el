@@ -201,20 +201,15 @@ Then Gemini will start by gdb, please send new issue with `*gemini*' buffer cont
 	   (gemini-epc-call-deferred gemini-epc-process (read method) args))
     (gemini-start-process)))
 
-(defvar gemini-is-starting nil)
-
 (defun gemini-restart-process ()
   "Stop and restart Gemini process."
   (interactive)
-  (setq gemini-is-starting nil)
-
   (gemini-kill-process)
   (gemini-start-process)
   (message "[Gemini] Process restarted."))
 
 (defun gemini-start-process ()
   "Start Gemini process if it isn't started."
-  (setq gemini-is-starting t)
   (unless (gemini-epc-live-p gemini-epc-process)
     ;; start epc server and set `gemini-server-port'
     (gemini--start-epc-server)
@@ -279,7 +274,6 @@ Then Gemini will start by gdb, please send new issue with `*gemini*' buffer cont
                             :connection (gemini-epc-connect "localhost" gemini-epc-port)
                             ))
   (gemini-epc-init-epc-layer gemini-epc-process)
-  (setq gemini-is-starting nil)
 
   (message "[Gemini] Process started successfully."))
 
@@ -553,10 +547,6 @@ Then Gemini will start by gdb, please send new issue with `*gemini*' buffer cont
     (goto-char gemini-draft--begin)
     (insert draft))
   (setq gemini-draft--end (+ gemini-draft--begin (length draft))))
-
-(unless gemini-is-starting
-  (gemini-start-process))
-
 
 (provide 'gemini)
 ;;; gemini.el ends here
