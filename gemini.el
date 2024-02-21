@@ -58,7 +58,7 @@
 ;;
 ;;
 ;; All of the above can customize by:
-;;      M-x customize-group RET bard RET
+;;      M-x customize-group RET gemini RET
 ;;
 
 

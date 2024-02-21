@@ -39,7 +39,7 @@ except:
 epc_client: Optional[EPCClient] = None
 
 # initialize logging, default to STDERR and INFO level
-logger = logging.getLogger("bard")
+logger = logging.getLogger("gemini")
 logger.setLevel(logging.INFO)
 logger.addHandler(logging.StreamHandler())
 
@@ -78,7 +78,7 @@ def eval_in_emacs(method_name, *args):
 
 def message_emacs(message: str):
     """Message to Emacs with prefix."""
-    eval_in_emacs("message", "[Bard] " + message)
+    eval_in_emacs("message", "[Gemini] " + message)
 
 
 def epc_arg_transformer(arg):
