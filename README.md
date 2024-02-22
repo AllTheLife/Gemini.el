@@ -20,7 +20,11 @@ This package will not be uploaded to melpa, thanks for your understanding.
 ```
 (setq gemini-api-token "your api token")
 ```
-4. Start gemini process
+4. (optional) You may need to set up a proxy if you are not in a region or country Google Gemini allowed or in order to accelerate Google API request.
+```
+(setq gemini-http-proxy "http://localhost:port")
+```
+5. Start gemini process
 ```
 (gemini-start-process)
 ```
