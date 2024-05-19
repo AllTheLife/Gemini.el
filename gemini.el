@@ -105,6 +105,13 @@
   :type 'numberp
   :group 'gemini)
 
+(defcustom gemini-chat-buffer-name nil
+  "The buffer name of the chat buffer.
+
+If nil, it uses the current buffer."
+  :type 'string
+  :group 'gemini)
+
 (defvar gemini-server nil
   "The Gemini Server.")
 
@@ -281,16 +288,25 @@ Then Gemini will start by gdb, please send new issue with `*gemini*' buffer cont
 
   (message "[Gemini] Process started successfully."))
 
-(defun gemini-chat-with-message (prompt)
-  (save-excursion
-    (goto-char (point-max))
-    (insert "## User:\n")
-    (insert (format "%s\n" prompt)))
+(defun gemini--get-chat-buffer ()
+  "Get the chat buffer."
+  (if gemini-chat-buffer-name
+      (get-buffer-create gemini-chat-buffer-name)
+    (current-buffer)))
 
-  (message "[Gemini] Please wait for Gemini...")
-  (gemini-call-async "gemini_chat"
-		             prompt
-		             (buffer-name)))
+(defun gemini-chat-with-message (prompt)
+  (let ((buffer (gemini--get-chat-buffer)))
+    (with-current-buffer buffer
+      (save-excursion
+        (goto-char (point-max))
+        (insert "## User:\n")
+        (insert (format "%s\n" prompt)))
+
+      (message "[Gemini] Please wait for Gemini...")
+      (gemini-call-async "gemini_chat"
+		                 prompt
+		                 (or gemini-chat-buffer-name
+                             (buffer-name))))))
 
 (defun gemini-finish-answer (buffer)
   (save-excursion
